@@ -39,7 +39,7 @@ jobs:
         run: |
           git clone https://github.com/kivy/python-for-android.git /tmp/p4a
           cd /tmp/p4a
-          COMMIT=$(git rev-list -n 1 --before="2025-01-01" master)
+          COMMIT=$(git rev-list -n 1 --before="2025-01-01" develop)
           echo "Checking out p4a commit: $COMMIT"
           git checkout $COMMIT
           echo "=== Python version in recipe ==="
