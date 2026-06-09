@@ -25,17 +25,27 @@ jobs:
             git zip unzip openjdk-17-jdk \
             libffi-dev libssl-dev autoconf libtool \
             pkg-config zlib1g-dev libncurses5-dev \
-            cmake ninja-build
+            cmake ninja-build \
+            build-essential ccache
 
-      - name: Install buildozer
+      - name: Install buildozer and tools
         run: |
           pip install --upgrade pip
-          pip install setuptools
-          pip install buildozer==1.5.0 cython==0.29.37
+          pip install setuptools wheel
+          pip install buildozer==1.5.0
+          pip install cython==0.29.37
+
+      - name: Cache buildozer global directory
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
+          restore-keys: buildozer-global-
 
       - name: Build APK
         run: |
-          yes | buildozer android debug
+          yes | buildozer android debug 2>&1 | tee build.log
+        timeout-minutes: 60
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -43,3 +53,11 @@ jobs:
           name: bsmonitor-apk
           path: bin/*.apk
           retention-days: 7
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          retention-days: 3
