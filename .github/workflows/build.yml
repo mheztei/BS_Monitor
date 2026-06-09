@@ -35,17 +35,10 @@ jobs:
           pip install buildozer==1.5.0
           pip install cython==0.29.37
 
-      - name: Cache buildozer global directory
-        uses: actions/cache@v4
-        with:
-          path: ~/.buildozer
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
-          restore-keys: buildozer-global-
-
       - name: Build APK
         run: |
-          yes | buildozer android debug 2>&1 | tee build.log
-        timeout-minutes: 60
+          set -o pipefail
+          yes | buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -59,5 +52,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-log
-          path: build.log
+          path: .buildozer/android/platform/build-*/dists/bsmonitor/build.log
           retention-days: 3
+          if-no-files-found: ignore
