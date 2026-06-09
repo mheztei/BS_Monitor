@@ -10,6 +10,8 @@ version = 1.0
 
 requirements = python3,kivy==2.3.0,kivymd==1.2.0,plyer
 
+p4a.branch = 2024.01.21
+
 orientation = portrait
 fullscreen = 0
 
