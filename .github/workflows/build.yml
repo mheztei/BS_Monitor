@@ -13,10 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
       - name: Install system dependencies
         run: |
@@ -35,22 +35,6 @@ jobs:
           pip install cython==0.29.37
           pip install buildozer==1.5.0
 
-      - name: Clone p4a at Python 3.12 era (before Python 3.14)
-        run: |
-          git clone https://github.com/kivy/python-for-android.git /tmp/p4a
-          cd /tmp/p4a
-          COMMIT=$(git rev-list -n 1 --before="2025-01-01" develop)
-          echo "Checking out p4a commit: $COMMIT"
-          git checkout $COMMIT
-          echo "=== Python version in recipe ==="
-          grep -i "version" pythonforandroid/recipes/python3/__init__.py | head -5
-
-      - name: Configure buildozer to use pinned p4a
-        run: |
-          echo "p4a.source_dir = /tmp/p4a" >> buildozer.spec
-          echo "=== buildozer.spec ==="
-          cat buildozer.spec
-
       - name: Build APK
         run: |
           yes | buildozer android debug
@@ -61,12 +45,3 @@ jobs:
           name: bsmonitor-apk
           path: bin/*.apk
           retention-days: 7
-
-      - name: Upload build log on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build.log
-          retention-days: 3
-          if-no-files-found: ignore
